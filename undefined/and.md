@@ -50,3 +50,54 @@
 
 ### 📌 DispatcherServlet
 
+스프링에서는 DispatcherServlet 이 서블릿의 역할을 수행한다.
+
+일반적으로 스프링은 톰캣을 임베드해 사용한다.
+
+그렇기 때문에 서블릿 컨테이너와 DispatcherServlet 은 자동 설정된 web.xml 의 설정값을 공유한다.
+
+
+
+DispatcherServlet 의 동작을 간략히 살펴보겠습니다.
+
+DispatcherServlet 으로 요청이 들어오면 DispatcherServlet은 핸들러 매핑을 통해 요청 URI 에 매핑된 핸들러를 탐색한다. 여기서 핸들러는 컨트롤러를 의미한다.
+
+그리고 핸들러 어댑터로 컨트롤러를 호출한다.
+
+핸들러 어댑터에 컨트롤러의 응답이 돌아오면 ModelAndView로 응답을 가공해 반환한다.
+
+뷰 형식으로 리턴하는 컨트롤러를 사용할 때는 뷰 리졸버를 통해 뷰를 받아 리턴한다.
+
+
+
+DispatcherServlet 은 모든 요청을 받아들이고, 해당 요청을 처리할 적절한 핸들러에게 전달한다.
+
+이 과정에서 요청의 경로와 HTTP 메서드를 기반으로 적절한 컨트롤러를 결정한다.
+
+적절한 컨트롤러를 결정하기 위해서 DispatcherServlet 은 핸들러 매핑 정보를 사용하게 된다.
+
+이는 URL 패턴과 컨트롤러 메서드 간의 매핑을 정의한다.
+
+선택된 컨트롤러의 메서드를 호출하기 위해 DispatcherServlet 은 핸들러 어댑터를 사용한다.
+
+이 어댑터는 컨트롤러 메서드의 호출 방식과 매개변수 바인딩 등을 처리한다.
+
+
+
+컨트롤러가 처리를 완료하고 반환하는 뷰 이름을 기반으로, DispatcherServlet 은 적절한 뷰 객체를 찾아 클라이언트에게 응답을 반환한다.
+
+
+
+만약에 우리가 Spring 에서 프론트코드까지 다루게 된다면 뷰 리졸버를 호출하게 될것이다.
+
+하지만 우리는 REST 형식의 @ResponseBody 를 자주 사용하게 된다.&#x20;
+
+그러므로 MessageConverter 를 거쳐 JSON 형식으로 변환해서 응답한다.
+
+<figure><img src="../.gitbook/assets/스크린샷 2023-11-25 오후 9.51.36.png" alt="" width="563"><figcaption></figcaption></figure>
+
+여기서 MessageConverter 는 요청과 응답에 대해 Body 값을 변환하는 역할을 수행한다.
+
+스프링 부트의 자동 설정 내역을 보면 HttpMessageConverter 인터페이스를 사용하고 있다.
+
+[https://jaimemin.tistory.com/1823](https://jaimemin.tistory.com/1823)
