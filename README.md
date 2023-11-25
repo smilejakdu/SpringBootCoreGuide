@@ -1,3 +1,3 @@
-# springBootCoreGuideㅌㅌ
+# 스프링 부트란?
 
-ㄴㅁㄴㅇㅁㄴㅇㅁㄴㅇ
+{% embed url="https://product.kyobobook.co.kr/detail/S000061352140" %}
