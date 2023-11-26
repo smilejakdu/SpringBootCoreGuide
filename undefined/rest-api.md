@@ -37,3 +37,35 @@ REST 아키텍처를 구현하는 웹 서비스를 REST ful 하다 라고 표현
 * 클라이언트-서버 아키텍처\
   REST 서버는 API를 제공하고 클라이언트는 사용자 정보를 관리하는 구조로 분리해 설계합니다.\
   이 구성은 서로에 대한 의존성을 낮추는 기능을 한다.&#x20;
+
+### 📌 REST 의 URI 설계 규칙
+
+REST API 를 설계하는 데는 다음과 같은 몇 가지 규칙이 있다.
+
+* URL 규칙
+  * URI 의 마지막에는 / 를 포함하지 않습니다.\
+    옳은 예 : http://localhost.com/product\
+    잘못된 예: http://localhost.com/product/\
+    `끝에 포함하지 않는이유는 디렉토리 또는 하위 자원을 포함할 수 있는 컬렉션처럼 해석될 수 있기 때문이다.`&#x20;
+  * 언더바는 사용하지 않습니다. 대신 하이픈을 사용합니다.\
+    http://localhost.com/provider-company-name ( 0 )\
+    http://localhost:com/provider\_company\_name ( x )\
+    \
+    위와 같은 이유는 몇가지 이유가 존재한다. \
+    1\. 과거 검색엔진에는 provider\_company\_name 은 검색엔진에 의해 providercompanyname 처럼 하나의 긴 단어로 인식되지만 provider-company-name 은 세 개의 별도 단어로 인식된다.\
+    2\. 웹 표준과 관련된 권장 사항은 보통 하이픈 사용을 권장한다. 표준을 준수하는것은 중요하다.
+  * URL 에는 행위가 아닌 결과를 포함합니다.\
+    http://localhost.com/product/123 ( 0 )\
+    http://localhost.com/delete-product/123 ( x )
+  * URI 는 소문자로 작성해야 한다.\
+    URI 리소스 경로에는 대문자 사용을 피하는 것이 좋다.\
+    일부 웹 서버의 운영체제는 리소스 경로 부분의 대소문자를 다른 문자로 인식하기 때문이다. \
+    \
+    1\. `기술적으로 http://example.com/About 와 http://example.com/about 은 다른 주소로 인식 될 수 있다.`\
+    2\. `일부 검색 엔진은 대소문자를 구분하여 다른 URL 로 인식 할 수 있다. 이는 SEO에 부정적인 영향을 미칠 수 있으며, 같은 페이지에 대한 인덱스가 중복될 수 있다. 소문자만 사용함으로써, 이러한 문제를 방지할 수 있다.`
+  * `파일의 확장자는 URI에 포함하지 않습니다.`\
+    `HTTP에서 제공하는 Accept 헤더를 사용하는 것이 좋습니다.`\
+    \
+
+
+왜 포함시키지 않을까 ??&#x20;
