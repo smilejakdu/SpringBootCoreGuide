@@ -13,4 +13,5 @@
   * [API를 작성하는 다양한 방법](undefined-1/api.md)
 * [데이터베이스 연동](undefined-2/README.md)
   * [ORM](undefined-2/orm.md)
-  * [Page 2](undefined-2/page-2.md)
+  * [Entity](undefined-2/entity.md)
+  * [Repository](undefined-2/repository.md)
