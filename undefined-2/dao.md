@@ -192,3 +192,36 @@ public <S extends T> S save(S entity) {
 
 삭제하고자 하는 레코드와 매핑된 영속 객체를 영속성 컨텍스트에 가져와야 한다.
 
+deleteProduct() 메서드는 findById() 메서드를 통해 객체를 가져오는 작업을 수행하고, delete() 메서드를 통해 해당 객체를 삭제하게끔 삭제 요청을 한다.
+
+
+
+```java
+@Override
+@Transactional
+@SuppressWarnings("unchecked")
+public void delete(T entity) {
+
+    Assert.notNull(entity, "Entity must not be null!");
+    
+    if (entityInformation.isNew(entity)) {
+        return;
+    }
+    
+    class<?> type = ProxyUtils.getUserClass(entity);
+    T existing = (T) em.find(type, entityInformation.getId(entity));
+    
+    // if the entity to be deleted doesn't exist, delete is a NOOP
+    if (existing == null) {
+        return;
+    }
+    
+    em.remove(em.contains(entity) ? entity: em.merge(entity));
+    
+```
+
+
+
+```java
+```
+
