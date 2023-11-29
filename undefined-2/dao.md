@@ -192,7 +192,7 @@ public <S extends T> S save(S entity) {
 
 삭제하고자 하는 레코드와 매핑된 영속 객체를 영속성 컨텍스트에 가져와야 한다.
 
-deleteProduct() 메서드는 findById() 메서드를 통해 객체를 가져오는 작업을 수행하고, delete() 메서드를 통해 해당 객체를 삭제하게끔 삭제 요청을 한다.
+deleteProduct() 메서드는 findById() 메서드를 통해 객체를 가져오는 작업을 수행하고, delete() 메서드를 통해 해당 객체를 삭제하게끔 삭제 요청을 한다
 
 
 
@@ -223,5 +223,335 @@ public void delete(T entity) {
 
 
 ```java
+package com.springboot.jpa.data.dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+
+// 예제 6.19
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString
+@Builder
+public class ProductDto {
+
+    private String name;
+    private int price;
+    private int stock;
+
+}
+
 ```
+
+```java
+package com.springboot.test.data.dto;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString
+public class ProductResponseDto {
+
+    private Long number;
+    private String name;
+    private int price;
+    private int stock;
+}
+
+```
+
+
+
+```java
+package com.springboot.valid_exception.service;
+
+
+import com.springboot.valid_exception.data.dto.ProductDto;
+import com.springboot.valid_exception.data.dto.ProductResponseDto;
+
+public interface ProductService {
+
+    ProductResponseDto getProduct(Long number);
+    ProductResponseDto saveProduct(ProductDto productDto);
+    ProductResponseDto changeProductName(Long number, String name) throws Exception;
+    void deleteProduct(Long number) throws Exception;
+}
+```
+
+
+
+<figure><img src="../.gitbook/assets/스크린샷 2023-11-29 오후 10.35.17.png" alt=""><figcaption></figcaption></figure>
+
+```java
+package com.springboot.jpa.service.impl;
+
+import com.springboot.jpa.data.dao.ProductDAO;
+import com.springboot.jpa.data.dto.ProductDto;
+import com.springboot.jpa.data.dto.ProductResponseDto;
+import com.springboot.jpa.data.entity.Product;
+import com.springboot.jpa.service.ProductService;
+import java.time.LocalDateTime;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+// 예제 6.22
+@Service
+public class ProductServiceImpl implements ProductService {
+
+    private final ProductDAO productDAO;
+
+    @Autowired
+    public ProductServiceImpl(ProductDAO productDAO) {
+        this.productDAO = productDAO;
+    }
+
+    // 예제 6.23
+    @Override
+    public ProductResponseDto getProduct(Long number) {
+        Product product = productDAO.selectProduct(number);
+
+        ProductResponseDto productResponseDto = new ProductResponseDto();
+        productResponseDto.setNumber(product.getNumber());
+        productResponseDto.setName(product.getName());
+        productResponseDto.setPrice(product.getPrice());
+        productResponseDto.setStock(product.getStock());
+
+        return productResponseDto;
+    }
+
+    // 예제 6.24
+    @Override
+    public ProductResponseDto saveProduct(ProductDto productDto) {
+        Product product = new Product();
+        product.setName(productDto.getName());
+        product.setPrice(productDto.getPrice());
+        product.setStock(productDto.getStock());
+        product.setCreatedAt(LocalDateTime.now());
+        product.setUpdatedAt(LocalDateTime.now());
+
+        Product savedProduct = productDAO.insertProduct(product);
+
+        ProductResponseDto productResponseDto = new ProductResponseDto();
+        productResponseDto.setNumber(savedProduct.getNumber());
+        productResponseDto.setName(savedProduct.getName());
+        productResponseDto.setPrice(savedProduct.getPrice());
+        productResponseDto.setStock(savedProduct.getStock());
+
+        return productResponseDto;
+    }
+
+    // 예제 6.25
+    @Override
+    public ProductResponseDto changeProductName(Long number, String name) throws Exception {
+        Product changedProduct = productDAO.updateProductName(number, name);
+
+        ProductResponseDto productResponseDto = new ProductResponseDto();
+        productResponseDto.setNumber(changedProduct.getNumber());
+        productResponseDto.setName(changedProduct.getName());
+        productResponseDto.setPrice(changedProduct.getPrice());
+        productResponseDto.setStock(changedProduct.getStock());
+
+        return productResponseDto;
+    }
+
+    // 예제 6.26
+    @Override
+    public void deleteProduct(Long number) throws Exception {
+        productDAO.deleteProduct(number);
+    }
+}
+
+```
+
+인터페이스 구현체 클래스에서는 DAO 인터페이스를 선언하고 @Autowired 를 지정한 생성자를 통해 의존성을 주입받습니다. 그리고 인터페이스에서 정의한 메서드를 오버라이딩 합니다.
+
+조회 메서드에 해당하는 getProduct() 메서드를 구현합니다.
+
+현재 서비스 레이어에는 DTO 객체와 엔티티 객체가 공존하도록 설계돼 있어 변호나 작업이 필요합니다.
+
+DTO 객체를 생성하고 값을 넣어 초기화하는 작업을 수행하는데, 이런 부분은 빌더 패턴을 활용하거나 엔티티 객체나 DTO 객체 내부에 변환하는 메서드를 추가해서 간단하게 전환 할 수 있다.
+
+
+
+```java
+package com.springboot.jpa.service.impl;
+
+import com.springboot.jpa.data.dao.ProductDAO;
+import com.springboot.jpa.data.dto.ProductDto;
+import com.springboot.jpa.data.dto.ProductResponseDto;
+import com.springboot.jpa.data.entity.Product;
+import com.springboot.jpa.service.ProductService;
+import java.time.LocalDateTime;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+// 예제 6.22
+@Service
+public class ProductServiceImpl implements ProductService {
+
+    private final ProductDAO productDAO;
+
+    @Autowired
+    public ProductServiceImpl(ProductDAO productDAO) {
+        this.productDAO = productDAO;
+    }
+
+    // 예제 6.23
+    @Override
+    public ProductResponseDto getProduct(Long number) {
+        Product product = productDAO.selectProduct(number);
+
+        ProductResponseDto productResponseDto = new ProductResponseDto();
+        productResponseDto.setNumber(product.getNumber());
+        productResponseDto.setName(product.getName());
+        productResponseDto.setPrice(product.getPrice());
+        productResponseDto.setStock(product.getStock());
+
+        return productResponseDto;
+    }
+
+    // 예제 6.24
+    @Override
+    public ProductResponseDto saveProduct(ProductDto productDto) {
+        Product product = new Product();
+        product.setName(productDto.getName());
+        product.setPrice(productDto.getPrice());
+        product.setStock(productDto.getStock());
+        product.setCreatedAt(LocalDateTime.now());
+        product.setUpdatedAt(LocalDateTime.now());
+
+        Product savedProduct = productDAO.insertProduct(product);
+
+        ProductResponseDto productResponseDto = new ProductResponseDto();
+        productResponseDto.setNumber(savedProduct.getNumber());
+        productResponseDto.setName(savedProduct.getName());
+        productResponseDto.setPrice(savedProduct.getPrice());
+        productResponseDto.setStock(savedProduct.getStock());
+
+        return productResponseDto;
+    }
+
+    // 예제 6.25
+    @Override
+    public ProductResponseDto changeProductName(Long number, String name) throws Exception {
+        Product changedProduct = productDAO.updateProductName(number, name);
+
+        ProductResponseDto productResponseDto = new ProductResponseDto();
+        productResponseDto.setNumber(changedProduct.getNumber());
+        productResponseDto.setName(changedProduct.getName());
+        productResponseDto.setPrice(changedProduct.getPrice());
+        productResponseDto.setStock(changedProduct.getStock());
+
+        return productResponseDto;
+    }
+
+    // 예제 6.26
+    @Override
+    public void deleteProduct(Long number) throws Exception {
+        productDAO.deleteProduct(number);
+    }
+}
+
+```
+
+위는 DAO 를 통해서 product 를 CRUD 하는 코드이다.
+
+<figure><img src="../.gitbook/assets/스크린샷 2023-11-29 오후 10.58.52.png" alt="" width="375"><figcaption></figcaption></figure>
+
+컨트롤러는 클라이언트로부터 요청을 받고 해당 요청에 대해 서비스 레이어에 구현된 적절한 메서드를 호출해서 결과값을 받습니다.
+
+이처럼 컨트롤러는 요청과 응답을 전달하는 역할만 맡는 것이 좋습니다.
+
+```java
+package com.springboot.valid_exception.controller;
+
+import com.springboot.valid_exception.data.dto.ChangeProductNameDto;
+import com.springboot.valid_exception.data.dto.ProductDto;
+import com.springboot.valid_exception.data.dto.ProductResponseDto;
+import com.springboot.valid_exception.service.ProductService;
+import javax.validation.Valid;
+import javax.validation.constraints.Min;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@Validated
+@RestController
+@RequestMapping("/product")
+public class ProductController {
+
+    private final Logger LOGGER = LoggerFactory.getLogger(ProductController.class);
+
+    private final ProductService productService;
+
+    @Autowired
+    public ProductController(ProductService productService) {
+        this.productService = productService;
+    }
+
+    @GetMapping()
+    public ResponseEntity<ProductResponseDto> getProduct(@Min(value = 5) Long number) {
+
+        ProductResponseDto productResponseDto = productService.getProduct(number);
+
+        return ResponseEntity.status(HttpStatus.OK).body(productResponseDto);
+    }
+
+    @PostMapping()
+    public ResponseEntity<ProductResponseDto> createProduct(@RequestBody ProductDto productDto) {
+
+        ProductResponseDto productResponseDto = productService.saveProduct(productDto);
+
+        return ResponseEntity.status(HttpStatus.OK).body(productResponseDto);
+    }
+
+    @PutMapping()
+    public ResponseEntity<ProductResponseDto> changeProductName(
+        @Valid @RequestBody ChangeProductNameDto changeProductNameDto) throws Exception {
+
+        ProductResponseDto productResponseDto = productService.changeProductName(
+            changeProductNameDto.getNumber(),
+            changeProductNameDto.getName());
+
+        return ResponseEntity.status(HttpStatus.OK).body(productResponseDto);
+    }
+
+    @DeleteMapping()
+    public ResponseEntity<String> deleteProduct(Long number) throws Exception {
+        productService.deleteProduct(number);
+
+        return ResponseEntity.status(HttpStatus.OK).body("정상적으로 삭제되었습니다.");
+    }
+}
+
+```
+
+`@Validated` 메서드는 무엇일까 ?
+
+위의 어노테이션을 알기전에 먼저 `@Valid` 를 알아야한다.
+
+@Valid와 @Validated의 가장 큰 차이점은 검증 항목을 그룹으로 나눠서 검증할 수 있는지, 즉 Group Validation이 가능한 지 여부다. 자바에서 객체를 검증할 때 사용하도록 구현된 것이 javax.validation의 @Valid라면 여기서 Group Validation까지 가능하도록 구현된 것이 스프링 프레임워크의 @Validated라고 할 수 있다.
+
+<figure><img src="../.gitbook/assets/스크린샷 2023-11-29 오후 11.12.14.png" alt="" width="375"><figcaption></figcaption></figure>
 
