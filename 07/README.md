@@ -11,7 +11,7 @@
 
 ## ✅ 단위테스트와 통합 테스트
 
-<figure><img src=".gitbook/assets/스크린샷 2023-11-29 오후 11.47.46.png" alt="" width="375"><figcaption></figcaption></figure>
+<figure><img src="../.gitbook/assets/스크린샷 2023-11-29 오후 11.47.46.png" alt="" width="375"><figcaption></figcaption></figure>
 
 단위테스트는 테스트 대상의 범위를 기준으로 가장 작은 단위의 테스트 방식이다.
 
