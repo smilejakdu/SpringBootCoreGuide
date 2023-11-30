@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
-//@TestPropertySource("classpath:application-test.properties")
 @DataJpaTest
 public class ProductRepositoryTestByH2 {
 
