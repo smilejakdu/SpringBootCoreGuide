@@ -1,4 +1,4 @@
-# 단위 테스트 어노테이션
+# notFoundByIdTest
 
 ## Autowired
 
@@ -125,5 +125,111 @@ TDD 방식이라면 테스트코드를 먼저 작성하게 된다.
 
 하지만 회사의 사정에 따라서 작업하면 될것같다.
 
+회사 상황에 따라 다르지만 List 를 보여주게 될때 데이터가 없다면 빈 리스트를 보여주면 될것 같다&#x20;
 
+하지만 위에선 Id 값으로 특정 teacher 를 찾으려고 하는데 없는 not found 테스트를 하려고 하니까 `throw new` 에러를 반환 하도록 한다.
+
+
+
+우선 테스트 하기위해서 기능개발쪽에 null 값 반환하도록 한다.
+
+
+
+```java
+    @Transactional
+    public FindTeacherByIdResponseDto findOneTeacherById(
+            Long teacherId
+    ) {
+        Teacher teacher = null;
+        if (teacher == null) {
+            throw new NotFoundException("해당 선생님을 찾을 수 없습니다.");
+        }
+        return new FindTeacherByIdResponseDto();
+    }
+
+```
+
+이후 테스트 코드를 작성한다.
+
+```java
+package com.example.showmeyourability.service.teacherApplication;
+
+import com.example.showmeyourability.teacher.application.FindTeacherApplication;
+import com.example.showmeyourability.teacher.domain.Teacher;
+import com.example.showmeyourability.teacher.infrastructure.repository.TeacherRepository;
+import com.example.showmeyourability.users.domain.GenderType;
+import com.example.showmeyourability.users.domain.User;
+import com.example.showmeyourability.users.infrastructure.repository.UserRepository;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.crypto.bcrypt.BCrypt;
+import org.webjars.NotFoundException;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.when;
+
+
+@SpringBootTest
+public class FindTeacherApplicationTest {
+
+    @Autowired
+    TeacherRepository teacherRepository;
+    @Autowired
+    UserRepository userRepository;
+    @MockBean
+    FindTeacherApplication findTeacherApplication;
+
+    @BeforeEach
+    void setUp() {
+        String hashedPassword = BCrypt.hashpw("1234", BCrypt.gensalt());
+        // User user 를 3개 만들어줘
+        int[] numbers = {1, 2, 3, 4};
+        for (int number : numbers) {
+            Long numberL = (long) number;
+            User user = User.builder()
+                    .id(numberL)
+                    .email("robertvsd" + number + "@gmail.com") // 숫자를 문자열로 변환하여 결합
+                    .genderType(GenderType.MALE)
+                    .age(20)
+                    .img("img")
+                    .password(hashedPassword)
+                    .build();
+            userRepository.save(user);
+        }
+
+        long [] teacherNumList = {1, 2};
+        for (long teacherNumber : teacherNumList) {
+            User user = userRepository.findById(teacherNumber).get();
+            Teacher teacher = Teacher.builder()
+                    .id(teacherNumber)
+                    .user(user)
+                    .career("경력")
+                    .skill("스킬")
+                    .comments(null)
+                    .orders(null)
+                    .build();
+            teacherRepository.save(teacher);
+        }
+    }
+
+    @Test
+    void notFoundTeacherByIdTest() {
+        // given
+        Long teacherId = 3L;
+
+        when(findTeacherApplication.findOneTeacherById(teacherId))
+                .thenThrow(new NotFoundException("해당 선생님을 찾을 수 없습니다."));
+
+        // then
+        assertThrows(NotFoundException.class, () -> {
+            findTeacherApplication.findOneTeacherById(teacherId);
+        });        // NotFoundException: 해당 선생님을 찾을 수 없습니다.
+    }
+}
+
+```
 
