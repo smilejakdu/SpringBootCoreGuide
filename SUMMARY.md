@@ -19,5 +19,6 @@
   * [롬복 Lombok](undefined-2/lombok.md)
 * [07 테스트코드 작성하기](07/README.md)
   * [단위테스트 작성하기](07/undefined/README.md)
-    * [notFoundByIdTest](07/undefined/notfoundbyidtest.md)
+    * [foundByIdTest](07/undefined/foundbyidtest.md)
+    * [Page 1](07/undefined/page-1.md)
 * [08 Query DSL](08-query-dsl.md)

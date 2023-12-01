@@ -1,4 +1,4 @@
-# notFoundByIdTest
+# foundByIdTest
 
 ## Autowired
 
@@ -13,6 +13,8 @@
 * **동작 방식**: 테스트 실행 시, `@MockBean`으로 지정된 타입의 빈은 모의 객체로 교체되며, 이 모의 객체는 Mockito 프레임워크를 통해 관리됩니다. 이를 통해 실제 빈의 동작을 모의하거나 검증할 수 있습니다.
 
 
+
+## 실패 테스트&#x20;
 
 만약에&#x20;
 
@@ -230,6 +232,45 @@ public class FindTeacherApplicationTest {
         });        // NotFoundException: 해당 선생님을 찾을 수 없습니다.
     }
 }
+
+```
+
+위와 같이 테스트 코드를 작성했으면 이제 성공 테스트에 대한 테스트 코드를 작성한다.
+
+
+
+## 성공 테스트
+
+```java
+    @Test
+    void foundTeacherByIdTest() {
+        Long teacherId = 1L;
+
+        // 필요한 User 및 Teacher 객체 생성
+        User mockUser = new User();
+        mockUser.setId(teacherId);
+        mockUser.setEmail("robertvsd1@gmail.com");
+        // mockUser의 다른 필드도 필요에 따라 설정
+
+        Teacher mockTeacher = new Teacher();
+        mockTeacher.setId(teacherId);
+        mockTeacher.setUser(mockUser);
+        // mockTeacher의 다른 필드도 필요에 따라 설정
+
+        // FindTeacherByIdResponseDto 객체 생성 및 Teacher 객체 설정
+        FindTeacherByIdResponseDto mockResponse = new FindTeacherByIdResponseDto();
+        mockResponse.setTeacher(mockTeacher);
+
+        // 모의 동작 설정
+        when(findTeacherApplication.findOneTeacherById(teacherId)).thenReturn(mockResponse);
+
+        // 테스트 실행
+        FindTeacherByIdResponseDto actualResponse = findTeacherApplication.findOneTeacherById(teacherId);
+
+        // 검증
+        assertEquals(teacherId, actualResponse.getTeacher().getId());
+        assertEquals("robertvsd1@gmail.com", actualResponse.getTeacher().getUser().getEmail());
+    }
 
 ```
 
