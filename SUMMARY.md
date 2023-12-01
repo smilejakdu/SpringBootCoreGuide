@@ -18,5 +18,6 @@
   * [DAO 설계](undefined-2/dao.md)
   * [롬복 Lombok](undefined-2/lombok.md)
 * [07 테스트코드 작성하기](07/README.md)
-  * [단위테스트 작성하기](07/undefined.md)
+  * [단위테스트 작성하기](07/undefined/README.md)
+    * [단위 테스트 어노테이션](07/undefined/undefined.md)
 * [08 Query DSL](08-query-dsl.md)
