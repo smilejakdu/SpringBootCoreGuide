@@ -22,3 +22,6 @@
     * [foundByIdTest](07/undefined/foundbyidtest.md)
     * [Page 1](07/undefined/page-1.md)
 * [08 Query DSL](08-query-dsl.md)
+* [09 연관관계 매핑 종류와 방향](09.md)
+* [Page 2](page-2.md)
+* [Page 3](page-3.md)
