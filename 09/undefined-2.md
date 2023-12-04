@@ -143,22 +143,16 @@ class ProducerRepositoryTest {
 
         return producerRepository.save(producer);
     }
-
 }
 ```
 
 
 
-Transactional 어노테이션은 뭘까 ??
+테스트를 진행하게 되면 정상적으로 동작하게 된다.
 
-@Test 어노테이션 밑에다가 @Transactional 어노테이션이 존재한다.
+다만 다대다 연관관계에서는 중간 테이블이 생성되기 때문에 예기치 못한 쿼리가 생길 수 있다.
 
-```java
- // 예제 9.24
-    @Test
-    @Transactional
-    void relationshipTest2() {
-        Product product1 = saveProduct("동글펜", 5 ........
-```
+즉, 관리하기 힘든 포인트가 발생할 수 있다
 
-위의 코드에서의 Transactional 어노테이션은&#x20;
+그렇기 때문에 일대다 다대일 연관관계를 맺을 수 있는 중간 테이블 엔티티로 승격하는것이 좋다.
+

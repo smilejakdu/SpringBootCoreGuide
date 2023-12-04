@@ -26,3 +26,7 @@
   * [일대일 매핑](09/undefined.md)
   * [일대다 다대일 매핑](09/undefined-1.md)
   * [다대다 매핑](09/undefined-2.md)
+  * [영속성 전이](09/undefined-3.md)
+* [10 유효성 검사와 예외 처리](10/README.md)
+  * [스프링 부트에서의 유효성 검사](10/undefined.md)
+  * [예외 처리](10/undefined-1.md)
