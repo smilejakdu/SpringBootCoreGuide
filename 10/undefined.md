@@ -293,3 +293,140 @@ public class ValidationController {
 
 ## 커스텀 Validation 추가
 
+ConstraintValidator와 커스텀 어노테이션을 조합해서 별도의 유효성 검사 어노테이션을 생성 할 수 있습니다.
+
+TelephoneValidator 클래스를 생성합니다.
+
+```java
+package com.springboot.valid_exception.config.annotation;
+
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
+
+// 예제 10.8
+public class TelephoneValidator implements ConstraintValidator<Telephone, String> {
+
+    @Override
+    public boolean isValid(String value, ConstraintValidatorContext context) {
+        if(value==null){
+            return false;
+        }
+        return value.matches("01(?:0|1|[6-9])[.-]?(\\d{3}|\\d{4})[.-]?(\\d{4})$");
+    }
+}
+
+```
+
+TelephoneValidator 클래스를 ConstraintValidator 인터페이스의 구현체로 정의합니다.
+
+인터페이스를 선언할 때는 어떤 어노테이션 인터페이스인지 타입을 지정해야한다.
+
+ConstraintValidator 인터페이스는 invalid() 메서드를 정의하고 있다.
+
+이 메서드를 구현하려면 직접 유효성 검사 로직을 작성해야 한다.
+
+로직에서 false 가 리턴되면 MethodArgumentNotValidException 예외가 발생한다.
+
+```java
+package com.springboot.valid_exception.config.annotation;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+import javax.validation.Constraint;
+
+// 예제 10.9
+@Target(ElementType.FIELD)
+@Retention(RetentionPolicy.RUNTIME)
+@Constraint(validatedBy = TelephoneValidator.class)
+public @interface Telephone {
+    String message() default "전화번호 형식이 일치하지 않습니다.";
+    Class[] groups() default {};
+    Class[] payload() default {};
+}
+```
+
+
+
+* @Target 어노테이션은 이 어노테이션을 어디서 선언할 수 있는지 정의하는 데 사용된다.
+* @Retention 어노테이션은 이 어노테이션이 실제로 적용되고 유지되는 범위를 의미한다.
+  * RetentionPolicy.RUNTIME: 컴파일 이후에도 JVM 에 의해 계속 참조합니다. 리플렉션이나 로깅에 많이 사용되는 정책이다.
+  * RetentionPolicy.CLASS: 컴파일러가 클래스를 참조할 때까지 유지한다.
+  * RetentionPolicy.SOURCE: 컴파일 전까지만 유지됩니다. 컴파일 이후에는 사라집니다.
+
+인터페이스 내부에는 message(), groups(), payload() 요소를 정의해야 합니다.
+
+각 항목은 다음과 같은 의미를 가지고 있습니다.
+
+* meesage() : 유효성 검사가 실패할 경우 반환되는 메시지를 의미한다.
+* groups() : 유효성 검사를 사용하는 그룹으로 설정합니다.
+* payload() : 사용자가 추가 정보를 위해 전달하는 값입니다.
+
+이제 직접 생성한 새로운 유효성 검사 어노테이션을 적용해 보겠습니다.
+
+ValidatedRequestDto 클래스에서 phoneNumber 변수의 어노테이션을 변경합니다.
+
+```java
+    @Telephone
+    private String phoneNumber;
+```
+
+@Pattern 어노테이션을 @Telephone 어노테이션으로 변경합니다.
+
+메서드를 호출하면 유효성 검사에서 형식 오류를 감지하는것을 볼 수 있다.
+
+별도의 그룹을 지정하지 않았기 때문에 checkValidation() 메서드를 호출했을 때 오류가 발생합니다.
+
+
+
+아래는 전체 코드 입니다.&#x20;
+
+```java
+package com.springboot.valid_exception.data.dto;
+
+import com.springboot.valid_exception.config.annotation.Telephone;
+import com.springboot.valid_exception.data.group.ValidationGroup1;
+import com.springboot.valid_exception.data.group.ValidationGroup2;
+import lombok.*;
+
+import javax.validation.constraints.*;
+
+// 예제 10.6, 예제 10.10
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString
+@Builder
+public class ValidatedRequestDto {
+
+    @NotBlank
+    private String name;
+
+    @Email
+    private String email;
+
+    @Pattern(regexp = "01(?:0|1|[6-9])[.-]?(\\d{3}|\\d{4})[.-]?(\\d{4})$")
+    //@Telephone(groups = ValidationGroup2.class)
+    //@Telephone
+    private String phoneNumber;
+
+    @Min(value = 20, groups = ValidationGroup1.class)
+    @Max(value = 40, groups = ValidationGroup1.class)
+    //@Min(value = 20)
+    //@Max(value = 40)
+    private int age;
+
+    @Size(min = 0, max = 40)
+    private String description;
+
+    @Positive(groups = ValidationGroup2.class)
+    //@Positive
+    private int count;
+
+    @AssertTrue
+    private boolean booleanCheck;
+
+}
+
+```
