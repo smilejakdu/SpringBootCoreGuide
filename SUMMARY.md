@@ -21,6 +21,7 @@
   * [단위테스트 작성하기](07/undefined.md)
   * [Spring Data JPA 테스트 코드](07/spring-data-jpa/README.md)
     * [foundByIdTest](07/spring-data-jpa/foundbyidtest.md)
+    * [SecurityServiceTest](07/spring-data-jpa/securityservicetest.md)
 * [08 Query DSL](08-query-dsl.md)
 * [09 연관관계 매핑 종류와 방향](09/README.md)
   * [일대일 매핑](09/undefined.md)
